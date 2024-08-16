@@ -15,6 +15,7 @@ type Server struct {
 }
 
 func main() {
+	// tcp接続を受け付けるリスナーを生成
 	lis, err := net.Listen("tcp", addr)
 
 	if err != nil {
@@ -23,6 +24,7 @@ func main() {
 
 	log.Printf("Listening on: %s\n", addr)
 
+	// gRPCサーバーの生成
 	s := grpc.NewServer()
 
 	if err = s.Serve(lis); err != nil {

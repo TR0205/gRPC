@@ -10,6 +10,7 @@ import (
 var addr string = "localhost:50051"
 
 func main() {
+	// SSL設定は一旦無視
 	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	if err != nil {
