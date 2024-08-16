@@ -12,7 +12,7 @@ import (
 var addr string = "localhost:50051"
 
 func main() {
-	// SSL設定は一旦無視
+	// gRPCサーバーへ接続するクライアントの生成(SSL設定は一旦無視)
 	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	if err != nil {
@@ -20,6 +20,8 @@ func main() {
 	}
 	defer conn.Close()
 
+	// protoから生成されたクライアント
+	// GreetServiceで定義されたメソッドを呼び出すために使用
 	c := pb.NewGreetServiceClient(conn)
 
 	doGreat(c)

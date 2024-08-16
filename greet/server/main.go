@@ -24,7 +24,7 @@ func main() {
 
 	log.Printf("Listening on: %s\n", addr)
 
-	// gRPCサーバーの生成
+	// gRPCサーバーを生成し、GreetServiceを登録
 	s := grpc.NewServer()
 	pb.RegisterGreetServiceServer(s, &Server{})
 

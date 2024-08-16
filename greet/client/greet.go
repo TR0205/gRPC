@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	// /protoにある「package proto」と書かれている.goファイルの関数などを使用可能
 	pb "example.com/grpc/greet/proto"
 )
 
