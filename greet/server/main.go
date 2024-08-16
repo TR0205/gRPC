@@ -26,6 +26,7 @@ func main() {
 
 	// gRPCサーバーの生成
 	s := grpc.NewServer()
+	pb.RegisterGreetServiceServer(s, &Server{})
 
 	if err = s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v\n", err)
