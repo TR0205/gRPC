@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "example.com/grpc/calculator/proto";
+
+message CalculatorRequest {
+  int32 num1 = 1;
+  int32 num2 = 2;
+}
+
+message CalculatorRespponse {
+  string result = 1;
+}
+
+service CalculatorService {
+  rpc Greet (CalculatorRequest) returns (CalculatorRespponse);
+}
