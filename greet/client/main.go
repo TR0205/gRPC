@@ -24,5 +24,6 @@ func main() {
 	// GreetServiceで定義されたメソッドを呼び出すために使用
 	c := pb.NewGreetServiceClient(conn)
 
-	doGreat(c)
+	// doGreat(c)
+	doGreetManyTimes(c)
 }
