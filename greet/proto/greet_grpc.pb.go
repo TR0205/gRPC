@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	GreetService_Greet_FullMethodName          = "/GreetService/Greet"
 	GreetService_GreetManyTimes_FullMethodName = "/GreetService/GreetManyTimes"
+	GreetService_LongGreet_FullMethodName      = "/GreetService/LongGreet"
 )
 
 // GreetServiceClient is the client API for GreetService service.
@@ -29,6 +30,7 @@ const (
 type GreetServiceClient interface {
 	Greet(ctx context.Context, in *GreetRequest, opts ...grpc.CallOption) (*GreetRespponse, error)
 	GreetManyTimes(ctx context.Context, in *GreetRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GreetRespponse], error)
+	LongGreet(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[GreetRequest, GreetRespponse], error)
 }
 
 type greetServiceClient struct {
@@ -68,12 +70,26 @@ func (c *greetServiceClient) GreetManyTimes(ctx context.Context, in *GreetReques
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type GreetService_GreetManyTimesClient = grpc.ServerStreamingClient[GreetRespponse]
 
+func (c *greetServiceClient) LongGreet(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[GreetRequest, GreetRespponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &GreetService_ServiceDesc.Streams[1], GreetService_LongGreet_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[GreetRequest, GreetRespponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type GreetService_LongGreetClient = grpc.ClientStreamingClient[GreetRequest, GreetRespponse]
+
 // GreetServiceServer is the server API for GreetService service.
 // All implementations must embed UnimplementedGreetServiceServer
 // for forward compatibility.
 type GreetServiceServer interface {
 	Greet(context.Context, *GreetRequest) (*GreetRespponse, error)
 	GreetManyTimes(*GreetRequest, grpc.ServerStreamingServer[GreetRespponse]) error
+	LongGreet(grpc.ClientStreamingServer[GreetRequest, GreetRespponse]) error
 	mustEmbedUnimplementedGreetServiceServer()
 }
 
@@ -89,6 +105,9 @@ func (UnimplementedGreetServiceServer) Greet(context.Context, *GreetRequest) (*G
 }
 func (UnimplementedGreetServiceServer) GreetManyTimes(*GreetRequest, grpc.ServerStreamingServer[GreetRespponse]) error {
 	return status.Errorf(codes.Unimplemented, "method GreetManyTimes not implemented")
+}
+func (UnimplementedGreetServiceServer) LongGreet(grpc.ClientStreamingServer[GreetRequest, GreetRespponse]) error {
+	return status.Errorf(codes.Unimplemented, "method LongGreet not implemented")
 }
 func (UnimplementedGreetServiceServer) mustEmbedUnimplementedGreetServiceServer() {}
 func (UnimplementedGreetServiceServer) testEmbeddedByValue()                      {}
@@ -140,6 +159,13 @@ func _GreetService_GreetManyTimes_Handler(srv interface{}, stream grpc.ServerStr
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type GreetService_GreetManyTimesServer = grpc.ServerStreamingServer[GreetRespponse]
 
+func _GreetService_LongGreet_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(GreetServiceServer).LongGreet(&grpc.GenericServerStream[GreetRequest, GreetRespponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type GreetService_LongGreetServer = grpc.ClientStreamingServer[GreetRequest, GreetRespponse]
+
 // GreetService_ServiceDesc is the grpc.ServiceDesc for GreetService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -157,6 +183,11 @@ var GreetService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "GreetManyTimes",
 			Handler:       _GreetService_GreetManyTimes_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "LongGreet",
+			Handler:       _GreetService_LongGreet_Handler,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "greet.proto",
